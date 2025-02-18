@@ -59,7 +59,7 @@ unsigned char *printBin(unsigned char data, unsigned char data_width)
         binary_str[data_width - 1 - i] = ((data >> i) & 1) + '0';
     }
 
-    binary_str[data_width] = '\0';
+    binary_str[data_width] = '\0'; // null terminator - common in c for strings
 
     return binary_str;
 }

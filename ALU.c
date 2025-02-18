@@ -66,6 +66,13 @@ unsigned char *printBin(unsigned char data, unsigned char data_width)
     return binary_str; // Return the binary string
 }
 
+// 2's complement
+unsigned char twosComp(unsigned char operand)
+{
+    printf("2's complement operand \n");
+    return (~operand) + 1;
+}
+
 // ADD operation
 unsigned int addSubOperation(unsigned char operand1, unsigned char operand2)
 {
@@ -75,15 +82,96 @@ unsigned int addSubOperation(unsigned char operand1, unsigned char operand2)
 // MUL operation
 unsigned int mulOperation(unsigned char operand1, unsigned char operand2)
 {
-    return operand1 * operand2;
+    // Initialize registers for Booth's multiplication
+    int product = 0;
+    int A = 0;                    // Accumulator
+    unsigned char Q = operand1;   // Multiplier (Q)
+    unsigned char M = operand2;   // Multiplicand (M)
+    int Q_1 = 0;                  // Q-1 bit
+    int count = 8;                // Number of bits
+
+    if (M & 0x80)
+    {                       // If negative
+        M = -(twosComp(M)); // Convert to negative value
+    }
+    else
+    {
+        M = M;
+    }
+    printf("\nBooth's Multiplication Algorithm Steps:\n");
+    printf("A             Q       Q_1     M   Q[0]     n\n");
+    printf("------------------------------------------------\n");
+
+    // LOOP count until 0
+    for (int i = 0; i < 8; i++)
+    {
+        int qscreen = Q & 0x01; // Current Q[0]
+        count = count - 1;
+
+        // Display current state
+        char *A_bin = printBin(A, 8);
+        printf("%s    ", A_bin);
+        
+        char *Q_bin = printBin(Q, 8);
+        printf("%s    ", Q_bin);
+        
+        printf("%d    ", Q_1);
+        
+        char *M_bin = printBin(M, 8);
+        printf("%s    ", M_bin);
+        
+        printf("%d    ", qscreen);
+        printf("%d\n", count);
+
+        // Free allocated memory
+        free(A_bin);
+        free(Q_bin);
+        free(M_bin);
+
+        // Booth's algorithm cases
+        if ((Q & 0x01) == 1 && Q_1 == 0) // Case 10
+        {
+            A = A - M;
+        }
+        else if ((Q & 0x01) == 0 && Q_1 == 1) // Case 01
+        {
+            A = A + M;
+        }
+
+        // Store Q[0] in Q_1 before shift
+        Q_1 = Q & 1;
+
+        // Arithmetic right shift for A and Q
+        Q = (Q >> 1) | ((A & 0x01) << 7);
+        A = (A >> 1);
+        if (A & 0x40)
+            A |= 0x80; // Sign extension for negative numbers
+    }
+
+    printf("\nFinal Result:\n");
+    printf("A: ");
+    char *final_A = printBin(A, 8);
+    printf("%s\n", final_A);
+    
+    printf("Q: ");
+    char *final_Q = printBin(Q, 8);
+    printf("%s\n", final_Q);
+    
+    printf("Product in binary: ");
+    product = (A << 8) | Q;
+    char *final_product = printBin(product, 16);
+    printf("%s\n", final_product);
+    
+    printf("Product in decimal: %d\n", product);
+
+    // Free final results memory
+    free(final_A);
+    free(final_Q);
+    free(final_product);
+
+    return product;
 }
 
-// 2's complement
-unsigned char twosComp(unsigned char operand)
-{
-    printf("2's complement operand \n");
-    return (~operand) + 1;
-}
 
 int ALU(unsigned char operand1, unsigned char operand2, unsigned char control_signal)
 {

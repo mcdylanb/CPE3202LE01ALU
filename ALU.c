@@ -3,19 +3,34 @@
 
 char *identifyOperation(unsigned char control_signal)
 {
-    if (control_signal == 0x01)
+    switch (control_signal)
     {
+    case 0x01:
         return "ADD";
-    }
-    else if (control_signal == 0x02)
-    {
+    case 0x02:
         return "SUB";
+    case 0x03:
+        return "MUL";
+    case 0x04:
+        return "AND";
+    case 0x05:
+        return "OR";
+    case 0x06:
+        return "NOT";
+    case 0x07:
+        return "XOR";
+    case 0x08:
+        return "Shift Right (logical)";
+    case 0x09:
+        return "Shift Left (logical)";
+    default:
+        return "Unknown Operation";
     }
 }
 
 int validateOperation(unsigned char input)
 {
-    unsigned char valid_operation[] = {0x01, 0x02}; // add, sub
+    unsigned char valid_operation[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09};
     int size = sizeof(valid_operation) / sizeof(valid_operation[0]);
 
     for (int i = 0; i < size; i++)
@@ -51,37 +66,60 @@ unsigned char *printBin(unsigned char data, unsigned char data_width)
     return binary_str; // Return the binary string
 }
 
+// ADD operation
+unsigned int addSubOperation(unsigned char operand1, unsigned char operand2)
+{
+    return operand1 + operand2;
+}
+
+// MUL operation
+unsigned int mulOperation(unsigned char operand1, unsigned char operand2)
+{
+    return operand1 * operand2;
+}
+
+// 2's complement
 unsigned char twosComp(unsigned char operand)
 {
-    printf("2's complement OP2 \n");
+    printf("2's complement operand \n");
     return (~operand) + 1;
 }
 
-/* This function represents the ALU */
 int ALU(unsigned char operand1, unsigned char operand2, unsigned char control_signal)
 {
     static unsigned int ACC;
-    unsigned char temp_OP1 = 0x00, temp_OP2 = 0x00;
+    unsigned char temp_OP1 = operand1, temp_OP2 = operand2;
 
-    /* Setting ACC and flags to initial values */
     ACC = 0x0000;
 
-    if (control_signal == 0x01 || control_signal == 0x02) // ADD or SUB respectively
+    switch (control_signal)
     {
-        /* Sign and Operation Check Logic */
-        temp_OP1 = operand1;
-        if (control_signal == 0x02)        // check if operation is SUB
-            temp_OP2 = twosComp(operand2); // 2’s complement operand2
-        else
-            temp_OP2 = operand2;
+    case 0x01:
+        ACC = addSubOperation(temp_OP1, temp_OP2); // ADD
+        break;
+    case 0x02:
+        temp_OP2 = twosComp(operand2); // 2's complement
 
-        /* 8-bit Adder */
-        printf("Adding OP1 & OP2... \n");
-        ACC = temp_OP1 + temp_OP2;
-        // printf("ACC binary = 0x%02X \n", ACC);
-    }
-    else if (control_signal == 0x03) // MUL
-    {
+        ACC = addSubOperation(temp_OP1, temp_OP2); // SUB
+        break;
+    case 0x03:
+        ACC = mulOperation(operand1, operand2); // MUL
+        break;
+    case 0x04:
+        return ACC;
+    case 0x05:
+        return ACC;
+    case 0x06:
+        return ACC;
+    case 0x07:
+        return ACC;
+    case 0x08:
+        return ACC;
+    case 0x09:
+        return ACC;
+    default:
+        printf("Invalid operation\n");
+        break;
     }
 
     return ACC;

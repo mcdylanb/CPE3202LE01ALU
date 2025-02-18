@@ -51,10 +51,10 @@ unsigned char *printBin(unsigned char data, unsigned char data_width)
     return binary_str; // Return the binary string
 }
 
-unsigned char twosComp(unsigned char operand2)
+unsigned char twosComp(unsigned char operand)
 {
     printf("2's complement OP2 \n");
-    return (~operand2) + 1;
+    return (~operand) + 1;
 }
 
 /* This function represents the ALU */
@@ -65,9 +65,8 @@ int ALU(unsigned char operand1, unsigned char operand2, unsigned char control_si
 
     /* Setting ACC and flags to initial values */
     ACC = 0x0000;
-    int SF = 0, CF = 0, ZF = 0, OF = 0;
 
-    if (control_signal == 0x01 || control_signal == 0x02) // ADD or SUB
+    if (control_signal == 0x01 || control_signal == 0x02) // ADD or SUB respectively
     {
         /* Sign and Operation Check Logic */
         temp_OP1 = operand1;
@@ -79,26 +78,39 @@ int ALU(unsigned char operand1, unsigned char operand2, unsigned char control_si
         /* 8-bit Adder */
         printf("Adding OP1 & OP2... \n");
         ACC = temp_OP1 + temp_OP2;
+        // printf("ACC binary = 0x%02X \n", ACC);
     }
-    else if (control_signal == 0x02) // MUL
+    else if (control_signal == 0x03) // MUL
     {
     }
-    // setFlags(ACC); // set the flags
 
     return ACC;
 }
 
 /* This function sets the flags after the arithmetic or logical operation */
-// void setFlags(unsigned int ACC)
-// {
-//     if (ACC == 0x0000) // check if value of ACC is equal to 0
-//     {
-//         int ZF = 1;
-//     }
-//     if ((ACC & 0x0080) == 0x0080) // check if sign (8th bit) of ACC is 1 (negative)
-//     {
-//     }
-// }
+void setFlags(unsigned int ACC)
+{
+    int SF = 0, CF = 0, ZF = 0, OF = 0; // sf - sign flag, cf - carry flag, of - overflow flag, zf - zero flag
+
+    if (ACC == 0x0000) // check if value of ACC is equal to 0
+    {
+        ZF = 1;
+    }
+    if ((ACC & 0x0080) == 0x0080) // check if sign (8th bit) of ACC is 1 (negative)
+    {
+        SF = 1;
+    }
+    if (ACC > 0x7F || ACC < 0x80)
+    {
+        OF = 1;
+    }
+    if (ACC > 0xFF)
+    {
+        CF = 1;
+    }
+
+    printf("ZF=%d, CF=%d, SF=%d, OF=%d\n", ZF, CF, SF, OF);
+}
 
 void main()
 {
@@ -142,5 +154,8 @@ void main()
 
     char *acc_binary = printBin(ACC, sizeof(ACC) * 16); // 16-bit magnitude
     printf("ACC = %s \n", acc_binary);
+
+    // set the flags
+    setFlags(ACC);
     printf("************************************** \n");
 }

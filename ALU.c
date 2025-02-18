@@ -46,24 +46,22 @@ int validateOperation(unsigned char input)
 
 unsigned char *printBin(unsigned char data, unsigned char data_width)
 {
-    // Allocate memory for the binary string (data_width + 1 for the null terminator)
-    char *binary_str = (char *)malloc(data_width + 1); // +1 for the null terminator
+    char *binary_str = (char *)malloc(data_width + 1);
     if (binary_str == NULL)
     {
-        printf("Memory allocation failed!\n");
-        exit(1); // Exit if memory allocation fails
+        exit(1);
     }
 
-    // Loop through each bit from most significant to least significant
+    // loop through each bit from most significant to least significant
     for (int i = data_width - 1; i >= 0; i--)
     {
-        // Fill the binary string with '0' or '1'
+        // fill the binary string with 0 or 1
         binary_str[data_width - 1 - i] = ((data >> i) & 1) + '0';
     }
 
-    binary_str[data_width] = '\0'; // Null-terminate the string
+    binary_str[data_width] = '\0';
 
-    return binary_str; // Return the binary string
+    return binary_str;
 }
 
 // ADD operation
@@ -85,6 +83,26 @@ unsigned char twosComp(unsigned char operand)
     return (~operand) + 1;
 }
 
+unsigned char bitwiseAND(unsigned char operand1, unsigned char operand2)
+{
+    return operand1 & operand2;
+}
+
+unsigned char bitwiseOR(unsigned char operand1, unsigned char operand2)
+{
+    return operand1 | operand2;
+}
+
+unsigned char bitwiseNOT(unsigned char operand1, unsigned char operand2)
+{
+    return (~operand1) & (~operand2);
+}
+
+unsigned char bitwiseXOR(unsigned char operand1, unsigned char operand2)
+{
+    return operand1 ^ operand2;
+}
+
 int ALU(unsigned char operand1, unsigned char operand2, unsigned char control_signal)
 {
     static unsigned int ACC;
@@ -94,28 +112,32 @@ int ALU(unsigned char operand1, unsigned char operand2, unsigned char control_si
 
     switch (control_signal)
     {
-    case 0x01:
-        ACC = addSubOperation(temp_OP1, temp_OP2); // ADD
+    case 0x01: // ADD
+        ACC = addSubOperation(temp_OP1, temp_OP2);
         break;
-    case 0x02:
-        temp_OP2 = twosComp(operand2); // 2's complement
+    case 0x02: // SUB
+        temp_OP2 = twosComp(operand2);
 
-        ACC = addSubOperation(temp_OP1, temp_OP2); // SUB
+        ACC = addSubOperation(temp_OP1, temp_OP2);
         break;
-    case 0x03:
-        ACC = mulOperation(operand1, operand2); // MUL
+    case 0x03: // MUL
+        ACC = mulOperation(operand1, operand2);
         break;
-    case 0x04:
+    case 0x04: // AND
+        ACC = bitwiseAND(operand1, operand2);
         return ACC;
-    case 0x05:
+    case 0x05: // OR
+        ACC = bitwiseOR(operand1, operand2);
         return ACC;
-    case 0x06:
+    case 0x06: // NOT
+        ACC = bitwiseNOT(operand1, operand2);
         return ACC;
-    case 0x07:
+    case 0x07: // XOR
+        ACC = bitwiseXOR(operand1, operand2);
         return ACC;
-    case 0x08:
+    case 0x08: // Shift Right (logical)
         return ACC;
-    case 0x09:
+    case 0x09: // Shift Left (logical)
         return ACC;
     default:
         printf("Invalid operation\n");
@@ -155,14 +177,14 @@ void main()
     unsigned char operand1, operand2, control_signal;
     unsigned char ACC;
 
-    printf("************************************** \n");
-    printf("Enter OP1: ");
+    printf("Enter OP1 in hexadecimal (e.g. 0x05): ");
     scanf("%hhx", &operand1);
 
-    printf("Enter OP2: ");
+    printf("Enter OP2 in hexadecimal (e.g. 0x03): ");
     scanf("%hhx", &operand2);
 
-    printf("Enter control signal: ");
+    printf("Enter control signal in hexadecimal\n ");
+    printf("0x01 - ADD\n 0x02 - SUB\n 0x03 - MUL\n 0x04 - AND\n 0x05 - OR\n 0x06 - NOT\n 0x07 - XOR\n 0x08 - Shift Right\n 0x09 - Shift Left \n: ");
     scanf("%hhx", &control_signal);
 
     // identify and validate operation
@@ -174,6 +196,7 @@ void main()
         exit(1);
     }
 
+    printf("\n************************************** \n");
     printf("Fetching operands... \n");
     // convert binary op1
     char *operand1_binary = printBin(operand1, sizeof(operand1) * 8);
@@ -188,12 +211,10 @@ void main()
 
     // ALU calculation
     ACC = ALU(operand1, operand2, control_signal);
-    // printf("ACC = 0x%02X \n", ACC);
 
-    char *acc_binary = printBin(ACC, sizeof(ACC) * 16); // 16-bit magnitude
+    char *acc_binary = printBin(ACC, sizeof(ACC) * 16);
     printf("ACC = %s \n", acc_binary);
 
     // set the flags
     setFlags(ACC);
-    printf("************************************** \n");
 }

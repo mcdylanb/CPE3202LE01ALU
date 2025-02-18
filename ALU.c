@@ -1,3 +1,6 @@
+// Team 5 Members:
+// - Nino Angelo Balagtas
+// - Mac Dylan Balagtas
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -59,7 +62,7 @@ unsigned char *printBin(unsigned char data, unsigned char data_width)
         binary_str[data_width - 1 - i] = ((data >> i) & 1) + '0';
     }
 
-    binary_str[data_width] = '\0';
+    binary_str[data_width] = '\0'; // null terminator - common in c for strings
 
     return binary_str;
 }
@@ -82,11 +85,11 @@ unsigned int mulOperation(unsigned char operand1, unsigned char operand2)
 {
     // Initialize registers for Booth's multiplication
     int product = 0;
-    int A = 0;                    // Accumulator
-    unsigned char Q = operand1;   // Multiplier (Q)
-    unsigned char M = operand2;   // Multiplicand (M)
-    int Q_1 = 0;                  // Q-1 bit
-    int count = 8;                // Number of bits
+    int A = 0;                  // Accumulator
+    unsigned char Q = operand1; // Multiplier (Q)
+    unsigned char M = operand2; // Multiplicand (M)
+    int Q_1 = 0;                // Q-1 bit
+    int count = 8;              // Number of bits
 
     if (M & 0x80)
     {                       // If negative
@@ -109,15 +112,15 @@ unsigned int mulOperation(unsigned char operand1, unsigned char operand2)
         // Display current state
         char *A_bin = printBin(A, 8);
         printf("%s    ", A_bin);
-        
+
         char *Q_bin = printBin(Q, 8);
         printf("%s    ", Q_bin);
-        
+
         printf("%d    ", Q_1);
-        
+
         char *M_bin = printBin(M, 8);
         printf("%s    ", M_bin);
-        
+
         printf("%d    ", qscreen);
         printf("%d\n", count);
 
@@ -150,16 +153,16 @@ unsigned int mulOperation(unsigned char operand1, unsigned char operand2)
     printf("A: ");
     char *final_A = printBin(A, 8);
     printf("%s\n", final_A);
-    
+
     printf("Q: ");
     char *final_Q = printBin(Q, 8);
     printf("%s\n", final_Q);
-    
+
     printf("Product in binary: ");
     product = (A << 8) | Q;
     char *final_product = printBin(product, 16);
     printf("%s\n", final_product);
-    
+
     printf("Product in decimal: %d\n", product);
 
     // Free final results memory
@@ -169,7 +172,6 @@ unsigned int mulOperation(unsigned char operand1, unsigned char operand2)
 
     return product;
 }
-
 
 unsigned char bitwiseAND(unsigned char operand1, unsigned char operand2)
 {

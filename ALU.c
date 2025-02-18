@@ -145,31 +145,8 @@ unsigned int mulOperation(unsigned char operand1, unsigned char operand2)
         // Arithmetic right shift for A and Q
         Q = (Q >> 1) | ((A & 0x01) << 7);
         A = (A >> 1);
-        if (A & 0x40)
-            A |= 0x80; // Sign extension for negative numbers
     }
-
-    printf("\nFinal Result:\n");
-    printf("A: ");
-    char *final_A = printBin(A, 8);
-    printf("%s\n", final_A);
-
-    printf("Q: ");
-    char *final_Q = printBin(Q, 8);
-    printf("%s\n", final_Q);
-
-    printf("Product in binary: ");
     product = (A << 8) | Q;
-    char *final_product = printBin(product, 16);
-    printf("%s\n", final_product);
-
-    printf("Product in decimal: %d\n", product);
-
-    // Free final results memory
-    free(final_A);
-    free(final_Q);
-    free(final_product);
-
     return product;
 }
 
